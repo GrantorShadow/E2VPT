@@ -75,6 +75,42 @@ class Trainer():
         self.evaluator = evaluator
         self.cpu_device = torch.device("cpu")
 
+        # # adding adversarial_IVC epochs code here # shaunak Code
+        # self.adv_iters = cfg.ADVERSARIAL.ITERS
+        # self.defense_iters = cfg.DEFENSE.ITERS
+        # self.current_mode = 'adversarial_IVC' # start out in phase 1 mode then move to phase 2
+
+    # TODO
+    # make new switch method - this one doesn't work
+    # UPDATE QUIP notebook with thoughts and progress
+    # ask PT on ratio of prompts
+    # might need to add an eval for adv mode (how badly model has messed up)
+    # need to add eval for defense mode
+    # need to rethink the goal, I am not understanding if the model is more robust then what?
+    # like what is my task for this week
+
+    # TODO
+    # step 1: (create) making sure you have an attack prompt and defense prompts
+    # step 2: regularize the attack prompts to the origin
+
+    # Shaunak Code
+
+    # add method to change the mode based on the phase
+    def switch_mode(self, iteration): # Shaunak Code
+        """ switch modes based on the epochs"""
+        total_phases = self.adv_iters + self.defense_iters
+        iter_phase = iteration % total_phases
+
+        if iter_phase < self.adv_iters:
+            self.current_mode = 'adversarial_IVC'
+            # build adv loss
+            self.cls_criterion = build_loss(self.cfg, mode=self.current_mode)
+            print(f"{iteration} iterations done, mode: ADV")
+        else:
+            self.current_mode = 'defense'
+            self.cls_criterion = build_loss(self.cfg, mode=self.current_mode)
+            print(f"{iteration} iterations done, mode: DEFENSE")
+
     def forward_one_batch(self, inputs, targets, is_train):
         """Train a single (full) epoch on the model using the given
         data loader.
@@ -186,6 +222,10 @@ class Trainer():
             end = time.time()
 
             for idx, input_data in enumerate(train_loader):
+                # switching modes # Shaunak Code
+                # self.switch_mode(iteration)
+                # iteration += 1
+
                 if self.cfg.DBG and idx == 20:
                     # if debugging, only need to see the first few iterations
                     break
