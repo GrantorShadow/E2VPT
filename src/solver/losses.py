@@ -66,13 +66,74 @@ class SoftmaxLoss(SigmoidLoss):
 
         return torch.sum(loss) / targets.shape[0]
 
+# Todo - 2024
+# make new negative softmax function
+# check if we need to apply any regularization or any kinda limiter since loss can go haywire
+
+class NegativeCrossEntropyLoss(SigmoidLoss):
+    def __init__(self, cfg=None):
+        super(NegativeCrossEntropyLoss, self).__init__()
+
+    def loss(self, logits, targets, per_cls_weights, kwargs):
+        weight = torch.tensor(
+            per_cls_weights, device=logits.device
+        )
+        negative_loss = -(F.cross_entropy(logits, targets, weight, reduction="none")) # negate the loss
+
+        # TODO check if we need to apply any regularization or any kinda limiter since loss can go haywire
+        return negative_loss
+
+    def forward(
+        self, pred_logits, targets, per_cls_weights, multihot_targets=False
+    ):
+        return self.loss(pred_logits, targets, per_cls_weights)
+
+    # Next TODO
+    # figure out a way to switch between losses
+    # also steps might need to be figured out
+
+# adversarial_IVC loss Shaunak Code
+def NegativeCrossEntropyWithThresholdLoss(SigmoidLoss):
+    def __init__(self, threshold, cfg=None):
+        super(NegativeCrossEntropyWithThresholdLoss, self).__init__()
+        self.threshold = threshold
+
+    def loss(self, logits, targets, per_cls_weights):
+        # Compute the standard cross-entropy loss
+        weight = torch.tensor(per_cls_weights, device=logits.device)
+        ce_loss = F.cross_entropy(logits, targets, weight=weight, reduction='none')
+
+        # Negate the cross-entropy loss
+        neg_ce_loss = -ce_loss
+
+        # Apply the threshold to the negative cross-entropy loss
+        threshold_tensor = torch.full_like(neg_ce_loss, fill_value=self.threshold)
+        loss_with_threshold = torch.max(neg_ce_loss, threshold_tensor)
+
+        # Return the mean of the loss with threshold
+        return loss_with_threshold.mean()
+
+    def forward(self, pred_logits, targets, per_cls_weights):
+        # Forward pass to compute the loss
+        return self.loss(pred_logits, targets, per_cls_weights)
+
 
 LOSS = {
     "softmax": SoftmaxLoss,
+    "negative_ce_with_threshold": NegativeCrossEntropyWithThresholdLoss,
+    "negative_ce": NegativeCrossEntropyLoss
 }
 
 
-def build_loss(cfg):
+def build_loss(cfg, mode=None):
+
+    # if mode == "adversarial_IVC":
+    #     loss_fn = LOSS["negative_ce_with_threshold"]
+    #     return loss_fn(cfg)
+    # elif mode == "defense":
+    #     loss_fn = LOSS["softmax"]
+    #     return loss_fn(cfg)
+
     loss_name = cfg.SOLVER.LOSS
     assert loss_name in LOSS, \
         f'loss name {loss_name} is not supported'
@@ -81,3 +142,13 @@ def build_loss(cfg):
         return None
     else:
         return loss_fn(cfg)
+
+# def adv_build_loss(cfg, mode):
+#
+#         assert loss_name in LOSS, \
+#             f'loss name {loss_name} is not supported'
+#     loss_fn = LOSS[loss_name]
+#     if not loss_fn:
+#         return None
+#     else:
+#         return loss_fn(cfg)
