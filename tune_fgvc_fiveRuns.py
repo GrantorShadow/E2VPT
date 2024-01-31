@@ -19,6 +19,14 @@ from src.models.build_model import build_model
 
 from train import train as train_main
 from launch import default_argument_parser, logging_train_setup
+
+def add_custom_config(cfg):
+    """ add custom fields to config """
+    cfg.SOLVER.LOSS_THRESHOLD = -5.0  # hyper-param
+    cfg.SOLVER.ADV_LOSS = "negative_ce"
+    cfg.K_TIMES = 5  # defense epochs
+    cfg.MODEL_MODE = "" # track attack or defense
+
 warnings.filterwarnings("ignore")
 
 def get_loaders(cfg, logger, final_runs=False):
@@ -55,6 +63,9 @@ def setup(args, lr, wd, final_runs, check_runtime=True, run_idx=None, seed=None)
     overwrite the 2 parameters in cfg and args
     """
     cfg = get_cfg()
+
+    add_custom_config(cfg)
+
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
 
