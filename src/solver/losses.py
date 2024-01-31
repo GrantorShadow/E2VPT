@@ -66,31 +66,32 @@ class SoftmaxLoss(SigmoidLoss):
 
         return torch.sum(loss) / targets.shape[0]
 
-# Todo - 2024
-# make new negative softmax function
-# check if we need to apply any regularization or any kinda limiter since loss can go haywire
 
 class NegativeCrossEntropyLoss(SigmoidLoss):
-    def __init__(self, cfg=None):
+    def __init__(self, cfg):
         super(NegativeCrossEntropyLoss, self).__init__()
+        self.loss_threshold = cfg.SOLVER.LOSS_THRESHOLD
+
 
     def loss(self, logits, targets, per_cls_weights, kwargs):
+        # thres = self.loss_threshold
+        # print("Current Loss threshold : ", thres)
         weight = torch.tensor(
             per_cls_weights, device=logits.device
         )
         negative_loss = -(F.cross_entropy(logits, targets, weight, reduction="none")) # negate the loss
+        # print(negative_loss)
 
-        # TODO check if we need to apply any regularization or any kinda limiter since loss can go haywire
-        return negative_loss
+        # Apply the threshold to the negative cross-entropy loss
+        threshold_tensor = torch.full_like(negative_loss, fill_value=self.loss_threshold)
+        # print(threshold_tensor)
 
-    def forward(
-        self, pred_logits, targets, per_cls_weights, multihot_targets=False
-    ):
-        return self.loss(pred_logits, targets, per_cls_weights)
+        loss_with_threshold = torch.max(negative_loss, threshold_tensor)
+        # print("loss:", negative_loss, " thresholded loss:", loss_with_threshold)
 
-    # Next TODO
-    # figure out a way to switch between losses
-    # also steps might need to be figured out
+        # Return the mean of the loss with threshold
+        return loss_with_threshold.mean() / targets.shape[0] # TODO check if loss being represented correctly and then do we need to mean it?
+
 
 # adversarial_IVC loss Shaunak Code
 def NegativeCrossEntropyWithThresholdLoss(SigmoidLoss):
