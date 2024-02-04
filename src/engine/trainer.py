@@ -32,7 +32,7 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 import torch.nn.functional as F
 import cv2
 
-from E2VPT.src.models import build_model
+# from E2VPT.src.models.build_model import build_model
 
 logger = logging.get_logger("visual_prompt")
 
@@ -160,29 +160,44 @@ class Trainer():
         labels = data["label"]
         return inputs, labels
 
-    def load_checkpoint(self):
-        checkpoint_path = "path/to/checkpoint.pth"
-        self.checkpointer.load(checkpoint_path)
-        self.resume_or_load(resume=True)
+    def load_checkpoint(self, model):
+        model_checkpointer = Checkpointer(model)
+        model_checkpointer.load(self.cfg.DATA.CHECKPOINT_PATH)
+        # self.resume_or_load(resume=True)
 
-    # def insert_adversarial_prompt(self):
-    #     """ Injects adversarial prompt and returns prompt + adv prompt """
-    #     # Extract weights from both models
-    #     adv_weights = {k: v.clone() for k, v in adv_model.named_parameters()}
-    #     rand_weights = {k: v.clone() for k, v in rand_model.named_parameters()}
-    #
-    #     # Combine the weights
-    #     combined_weights = add_weights(adv_weights, rand_weights)
-    #
-    #     # Load the combined weights into a new model
-    #     combined_model = build_model(cfg)
-    #     for name, param in combined_model.named_parameters():
-    #         param.data.copy_(combined_weights[name])
+    def insert_adversarial_prompt(self, model1, model2): # adv, model
+        """ Injects adversarial prompt and returns prompt + adv prompt """
+        # Extract weights from both models
+        adv_prompts = {k: v.clone() for k, v in model1.named_parameters()}
+        rand_prompts = {k: v.clone() for k, v in model2.named_parameters()}
 
-    def train_classifier(self, train_loader, val_loader, test_loader, adv_loss=None, ce_loss=None, ):
+        def combine_prompts(prompt1, prompt2):
+            combined_prompts = {}
+            for name in prompt1:
+                print(prompt1[name].shape)
+                print(prompt2[name].shape)
+                combined_prompts[name] = prompt1[name] + prompt2[name]
+            return combined_prompts
+
+
+        # Combine the weights
+        combined_prompts = combine_prompts(adv_prompts, rand_prompts)
+
+        # Load the combined weights into a new model
+        # combined_model = build_model(self.cfg)
+        for name, param in model2.named_parameters():
+            param.data.copy_(combined_prompts[name])
+
+        return model2
+
+    def train_classifier(self, train_loader, val_loader, test_loader, adv_model=None, adv_loss=None, ce_loss=None):
         """
         Train a classifier using epoch
         """
+        # # load the adv prompts and inject them into the current model
+        # adv_model, _ = build_model(self.cfg)
+        # self.load_checkpoint(adv_model)
+
         # save the model prompt if required before training
         self.model.eval()
         self.save_prompt(0)
@@ -212,6 +227,13 @@ class Trainer():
 
         # counter = 1 # for loss switching
         for epoch in range(total_epoch):
+
+            if self.mode == "def":
+                # inject the adversarial prompts
+                self.model = self.insert_adversarial_prompt(adv_model,
+                                                            self.model)
+                logger.info("Adversarial Prompts successfully injected")
+
             # TODO 2 model
             # if (epoch + 1) % 5 == 1:
             #     mode = "adv"
@@ -248,7 +270,7 @@ class Trainer():
             #         # merge both weights from adv and def mode
             #         self.insert_adversarial_prompt()
 
-                # reset averagemeters to measure per-epoch results
+            # reset averagemeters to measure per-epoch results
             losses.reset()
             batch_time.reset()
             data_time.reset()

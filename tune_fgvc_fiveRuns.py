@@ -26,6 +26,8 @@ def add_custom_config(cfg):
     cfg.SOLVER.ADV_LOSS = "negative_ce"
     cfg.K_TIMES = 5  # defense epochs
     cfg.MODEL_MODE = "" # track attack or defense
+    cfg.LOAD_MODEL_PATH = "/projectnb/ivc-ml/ssjoshi/adversarial/E2VPT/models/99_epoch_pretrained_vit.pth"
+    cfg.MODEL.WEIGHTS = cfg.LOAD_MODEL_PATH
 
 warnings.filterwarnings("ignore")
 
@@ -285,9 +287,33 @@ def QKV_main_largerrange(args):
             train_main(cfg, args)
             sleep(randint(1, 10))
 
+
+def QKV_single_run(args):
+    
+    cfg = setup(args, 0.05, 0.125, final_runs='final_runs')
+
+    cfg = setup(args, cfg.SOLVER.BASE_LR, cfg.SOLVER.WEIGHT_DECAY, final_runs='final_runs', run_idx=2, seed=42)
+    
+    train_main(cfg, args)
+
+
 def main(args):
     # default for train_type=='P_VK' (design for it)
-    QKV_main(args)
+    # QKV_main(args)
+
+    wandb.init(
+    # set the wandb project where this run will be logged
+    project="my-awesome-project",
+    
+    # track hyperparameters and run metadata
+    config={
+    "learning_rate": 0.02,
+    "architecture": "CNN",
+    "dataset": "CIFAR-100",
+    "epochs": 10,
+    })
+    
+    QKV_single_run(args)
 
 if __name__ == '__main__':
     args = default_argument_parser().parse_args()

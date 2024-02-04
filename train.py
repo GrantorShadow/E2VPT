@@ -21,6 +21,8 @@ from src.engine.trainer import Trainer
 from src.models.build_model import build_model
 from src.utils.file_io import PathManager
 
+from fvcore.common.checkpoint import Checkpointer
+
 from launch import default_argument_parser, logging_train_setup
 warnings.filterwarnings("ignore")
 
@@ -115,6 +117,12 @@ def train(cfg, args):
     evaluator = Evaluator()
     logger.info("Setting up Trainer...")
     trainer = Trainer(cfg, model, evaluator, cur_device)
+
+    if cfg.LOAD_MODEL_PATH is not None:    
+        logger.info("Loading pretrained model")
+        checkpointer = Checkpointer(model)
+        checkpointer.load(cfg.MODEL.WEIGHTS)
+        trainer.resume_or_load(resume=True)
 
     if train_loader:
         trainer.train_classifier(train_loader, val_loader, test_loader)
