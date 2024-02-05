@@ -1,0 +1,49 @@
+wandb_version: 1
+
+learning_rate:
+  desc: null
+  value: 0.0252
+weight_decay:
+  desc: null
+  value: 0.2
+architecture:
+  desc: null
+  value: VIT
+dataset:
+  desc: null
+  value: CUB-200
+epochs:
+  desc: null
+  value: 200
+_wandb:
+  desc: null
+  value:
+    python_version: 3.7.12
+    cli_version: 0.16.2
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1707114758.034652
+    t:
+      1:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      - 63
+      2:
+      - 1
+      - 5
+      - 41
+      - 53
+      - 55
+      - 63
+      3:
+      - 16
+      - 23
+      4: 3.7.12
+      5: 0.16.2
+      8:
+      - 5
+      13: linux-x86_64

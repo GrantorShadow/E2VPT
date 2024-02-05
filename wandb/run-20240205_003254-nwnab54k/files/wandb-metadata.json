@@ -1,0 +1,249 @@
+{
+    "os": "Linux-4.18.0-513.9.1.el8_9.x86_64-x86_64-with-centos-8.9-Midnight_Oncilla",
+    "python": "3.7.12",
+    "heartbeatAt": "2024-02-05T05:32:54.531218",
+    "startedAt": "2024-02-05T05:32:54.100063",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--config-file",
+        "configs/adversarial_IVC/cub_vit_base_P_VK_neg_ce.yaml",
+        "MODEL.TYPE",
+        "vit",
+        "DATA.BATCH_SIZE",
+        "128",
+        "MODEL.TRANSFER_TYPE",
+        "P_VK",
+        "MODEL.P_VK.DEEP",
+        "False",
+        "MODEL.P_VK.DEEP_P",
+        "False",
+        "MODEL.P_VK.DROPOUT_P",
+        "0.1",
+        "MODEL.P_VK.NUM_TOKENS_P",
+        "5",
+        "MODEL.P_VK.NUM_TOKENS",
+        "5",
+        "MODEL.P_VK.ORIGIN_INIT",
+        "2",
+        "MODEL.P_VK.SHARE_PARAM_KV",
+        "True",
+        "MODEL.P_VK.MASK_CLS_TOKEN",
+        "False"
+    ],
+    "state": "running",
+    "program": "tune_fgvc_fiveRuns.py",
+    "codePathLocal": "tune_fgvc_fiveRuns.py",
+    "codePath": "tune_fgvc_fiveRuns.py",
+    "git": {
+        "remote": "https://github.com/GrantorShadow/E2VPT",
+        "commit": "077b871df64816c781ffa2cd398ef16453aba9a4"
+    },
+    "email": null,
+    "root": "/projectnb/ivc-ml/ssjoshi/adversarial/E2VPT",
+    "host": "scc-f02",
+    "username": "ssjoshi",
+    "executable": "/projectnb/ivc-ml/ssjoshi/.conda/envs/prompt/bin/python",
+    "cpu_count": 32,
+    "cpu_count_logical": 32,
+    "cpu_freq": {
+        "current": 3.890343750000002,
+        "min": 1200.0,
+        "max": 3900.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.83,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.661,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.9,
+            "min": 1200.0,
+            "max": 3900.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 19.518142700195312,
+            "used": 12.69540023803711
+        }
+    },
+    "gpu": "Quadro RTX 6000",
+    "gpu_count": 5,
+    "gpu_devices": [
+        {
+            "name": "Quadro RTX 6000",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "Quadro RTX 6000",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "Quadro RTX 6000",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "Quadro RTX 6000",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "Quadro RTX 6000",
+            "memory_total": 25769803776
+        }
+    ],
+    "memory": {
+        "total": 376.0383415222168
+    }
+}

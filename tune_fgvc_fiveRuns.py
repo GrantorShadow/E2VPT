@@ -9,6 +9,8 @@ import glob
 from time import sleep
 from random import randint
 
+import wandb
+
 import src.utils.logging as logging
 from src.configs.config import get_cfg
 from src.utils.file_io import PathManager
@@ -22,7 +24,7 @@ from launch import default_argument_parser, logging_train_setup
 
 def add_custom_config(cfg):
     """ add custom fields to config """
-    cfg.SOLVER.LOSS_THRESHOLD = -5.0  # hyper-param
+    cfg.SOLVER.LOSS_THRESHOLD = -50.0  # hyper-param
     cfg.SOLVER.ADV_LOSS = "negative_ce"
     cfg.K_TIMES = 5  # defense epochs
     cfg.MODEL_MODE = "" # track attack or defense
@@ -290,7 +292,7 @@ def QKV_main_largerrange(args):
 
 def QKV_single_run(args):
     
-    cfg = setup(args, 0.05, 0.125, final_runs='final_runs')
+    cfg = setup(args, 0.001, 0.2522222, final_runs='final_runs') # this works
 
     cfg = setup(args, cfg.SOLVER.BASE_LR, cfg.SOLVER.WEIGHT_DECAY, final_runs='final_runs', run_idx=2, seed=42)
     
@@ -303,16 +305,17 @@ def main(args):
 
     wandb.init(
     # set the wandb project where this run will be logged
-    project="my-awesome-project",
+    project="adversarial-vpt",
     
     # track hyperparameters and run metadata
     config={
-    "learning_rate": 0.02,
-    "architecture": "CNN",
-    "dataset": "CIFAR-100",
-    "epochs": 10,
+    "learning_rate": 0.0252,
+    "weight_decay": 0.2,
+    "architecture": "VIT",
+    "dataset": "CUB-200",
+    "epochs": 200,
     })
-    
+
     QKV_single_run(args)
 
 if __name__ == '__main__':
