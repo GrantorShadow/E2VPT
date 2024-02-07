@@ -91,6 +91,13 @@ def get_loaders(cfg, logger):
         test_loader = data_loader.construct_test_loader(cfg)
     return train_loader,  val_loader, test_loader
 
+def load_checkpoint(trainer, model, load_path, resume):
+    """ load / resume model or just load weights """
+    model_checkpointer = Checkpointer(model)
+    model_checkpointer.load(load_path)
+    if resume:
+        trainer.resume_or_load(resume=True)
+
 
 def train(cfg, args):
     # clear up residual cache from previous runs
@@ -118,14 +125,24 @@ def train(cfg, args):
     logger.info("Setting up Trainer...")
     trainer = Trainer(cfg, model, evaluator, cur_device)
 
-    if cfg.LOAD_MODEL_PATH is not None:    
+    if cfg.LOAD_MODEL_PATH is not None:  
         logger.info("Loading pretrained model")
         checkpointer = Checkpointer(model)
         checkpointer.load(cfg.MODEL.WEIGHTS)
         trainer.resume_or_load(resume=True)
+    elif cfg.DATA.ADV_CHECKPOINT_PATH is not None:
+        logger.info("Constructing pretrained adv attack model & loading weights")
+        adv_model, _ = build_model(cfg) # TODO check if correct layers weights are loaded
+        
+        checkpointer = Checkpointer(model)
+        checkpointer.load(cfg.DATA.ADV_CHECKPOINT_PATH)
+        
+        # load_checkpoint(adv_model, cfg, cfg.DATA.ADV_CHECKPOINT_PATH, False)
+    else:
+        logger.info("Pretrained model not loaded!")
 
     if train_loader:
-        trainer.train_classifier(train_loader, val_loader, test_loader)
+        trainer.train_classifier(train_loader, val_loader, test_loader, adv_model=adv_model)
     else:
         print("No train loader presented. Exit")
 

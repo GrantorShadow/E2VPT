@@ -28,8 +28,11 @@ def add_custom_config(cfg):
     cfg.SOLVER.ADV_LOSS = "negative_ce"
     cfg.K_TIMES = 5  # defense epochs
     cfg.MODEL_MODE = "" # track attack or defense
-    cfg.LOAD_MODEL_PATH = "/projectnb/ivc-ml/ssjoshi/adversarial/E2VPT/models/99_epoch_pretrained_vit.pth"
+    cfg.LOAD_MODEL_PATH = None # "/projectnb/ivc-ml/ssjoshi/adversarial/E2VPT/models/99_epoch_pretrained_vit.pth"
     cfg.MODEL.WEIGHTS = cfg.LOAD_MODEL_PATH
+    cfg.MODEL_MODE = "def"
+    cfg.DATA.ADV_CHECKPOINT_PATH = "/projectnb/ivc-ml/ssjoshi/adversarial/E2VPT/models/adv_weights_epoch_13.pth" # ADVERSARIAL MODEL CHECKPOINT
+
 
 warnings.filterwarnings("ignore")
 
@@ -292,7 +295,7 @@ def QKV_main_largerrange(args):
 
 def QKV_single_run(args):
     
-    cfg = setup(args, 0.001, 0.2522222, final_runs='final_runs') # this works
+    cfg = setup(args, 0.1234, 0.03, final_runs='final_runs') # this works
 
     cfg = setup(args, cfg.SOLVER.BASE_LR, cfg.SOLVER.WEIGHT_DECAY, final_runs='final_runs', run_idx=2, seed=42)
     
