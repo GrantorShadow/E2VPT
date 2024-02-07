@@ -295,9 +295,9 @@ def QKV_main_largerrange(args):
 
 def QKV_single_run(args):
     
-    cfg = setup(args, 0.1234, 0.03, final_runs='final_runs') # this works
+    cfg = setup(args, 0.1000019, 0.03, final_runs='final_runs') # this works
 
-    cfg = setup(args, cfg.SOLVER.BASE_LR, cfg.SOLVER.WEIGHT_DECAY, final_runs='final_runs', run_idx=2, seed=42)
+    cfg = setup(args, cfg.SOLVER.BASE_LR, cfg.SOLVER.WEIGHT_DECAY, final_runs='final_runs', run_idx=3, seed=44)
     
     train_main(cfg, args)
 

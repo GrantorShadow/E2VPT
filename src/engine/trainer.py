@@ -180,17 +180,30 @@ class Trainer():
         def concat_prompts(adv_prompt1, robust_prompt2):
             combined_prompts = {}
             for name in adv_prompt1:
-                print(name)
-                combined_prompts[name] = cat(((robust_prompt2[name], adv_prompt1[name])), 
-                                             dim=0)
+                if name == 'enc.tranformer.prompt_embeddings':
+                    print(name)
+                    print(adv_prompt1[name].shape, robust_prompt2[name].shape)
+                    combined_prompts[name] = cat(((robust_prompt2[name], adv_prompt1[name])), 
+                                                dim=1) 
+                    
             return combined_prompts
 
         # Combine the weights
-        combined_prompts = concat_prompts(adv_prompts, rand_prompts)
+        concatenated_prompts = concat_prompts(adv_prompts, rand_prompts)
 
-        # copy the new prompts inplace of the old prompts
+        # with torch.no_grad():  # Ensure no gradients are computed for this operation
+        #     robust_model2.state_dict()['enc.transformer.prompt_embeddings'].copy_(concatenated_prompts)
+
+        # return robust_model2
+
+        # # load the model with new state dict
+        # # since we have a dim size of [1,5,768] which means we have 768 entries each in 5 rows (since 5 embeddings are added (check hyperparam)), all grouped in 1)
+        # robust_model2.load_state_dict(combined_prompts)
+        
+        # # copy the new prompts inplace of the old prompts
         for name, param in robust_model2.named_parameters():
-            param.data.copy_(combined_prompts[name])
+            if name == 'enc.tranformer.prompt_embeddings':
+                param.data.copy_(concatenated_prompts[name])
 
         return robust_model2
 
@@ -340,6 +353,17 @@ class Trainer():
             if patience >= self.cfg.SOLVER.PATIENCE:
                 logger.info("No improvement. Breaking out of loop.")
                 break
+        
+            # save the model weights at the end of each epoch in each phase
+            save_name = self.mode + "_weights_epoch_" + str(epoch)
+
+            Checkpointer(
+                self.model,
+                optimizer=self.optimizer,
+                scheduler=self.scheduler,
+                save_dir=self.cfg.OUTPUT_DIR,
+                save_to_disk=True
+            ).save(save_name)
 
         # save the last checkpoints
         if self.cfg.MODEL.SAVE_CKPT_FINALRUNS:
